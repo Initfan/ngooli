@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:freelance/components/card_worker.dart';
 import 'package:freelance/pages/home/worker_detail.dart';
 import 'package:freelance/utils/route.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class Workers extends StatefulWidget {
   const Workers({super.key, this.onTapBookmark, this.service});
@@ -20,33 +19,38 @@ class Workers extends StatefulWidget {
 class _WorkersState extends State<Workers> {
   @override
   Widget build(BuildContext context) {
+    print(widget.service);
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('worker')
           .where('profile_completed', isEqualTo: true)
-          .where('service_category', isEqualTo: widget.service)
+          .where(
+            'service_category',
+            isEqualTo: widget.service == 'All' ? null : widget.service,
+          )
           .snapshots(),
       builder: (context, snapshot) {
-        return Skeletonizer(
-          enabled: !snapshot.hasData,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: snapshot.data?.docs.length,
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final data = snapshot.data!.docs[index];
-              return GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  materialRoute(WorkerDetail(worker: data)),
-                ),
-                child: CardWorker(
-                  data: data,
-                  onTapBookmark: (worker) => widget.onTapBookmark,
-                ),
-              );
-            },
-          ),
+        if (!snapshot.hasData) {
+          return SizedBox();
+        }
+
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: snapshot.data!.docs.length,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final data = snapshot.data!.docs[index];
+            return GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                materialRoute(WorkerDetail(worker: data)),
+              ),
+              child: CardWorker(
+                data: data,
+                onTapBookmark: (worker) => widget.onTapBookmark,
+              ),
+            );
+          },
         );
       },
     );

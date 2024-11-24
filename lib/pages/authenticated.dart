@@ -24,7 +24,8 @@ class _AuthenticatedState extends State<Authenticated> {
 
   Future<bool> redirectToLanding() async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('doneLanding') && prefs.getBool('doneLanding')!) {
+    final doneLanding = prefs.getBool('doneLanding') ?? false;
+    if (doneLanding) {
       return true;
     }
     prefs.setBool('doneLanding', true);
@@ -41,28 +42,34 @@ class _AuthenticatedState extends State<Authenticated> {
       return Navigator.pushReplacement(context, materialRoute(LandingPage()));
     }
 
-    Provider.of<UserModel>(context).currentUser(currentUser);
     setState(() => _user = currentUser);
     final user = await FirebaseFirestore.instance
         .collection('users')
         .doc(currentUser.uid)
         .get();
-    if (user.exists && user.data()!.containsKey('role')) {
+    if (user.exists &&
+        user.data() != null &&
+        user.data()!.containsKey('role')) {
       if (user['role'] == 'worker') {
         return Navigator.pushReplacement(context, materialRoute(HomeWorker()));
       }
       return Navigator.pushReplacement(context, materialRoute(HomeUser()));
     }
+    return AuthPage();
   }
 
   @override
   void initState() {
     super.initState();
-    // checkAuthorize();
+    checkAuthorize();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_user != null) {
+      Provider.of<UserModel>(context).currentUser(_user!);
+    }
+
     return SizedBox();
   }
 }

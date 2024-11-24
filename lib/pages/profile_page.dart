@@ -36,7 +36,7 @@ class ProfilePage extends StatelessWidget {
             FutureBuilder(
               future: FirebaseFirestore.instance
                   .collection('users')
-                  .doc(user!.uid)
+                  .doc(user.uid)
                   .get(),
               builder: (context, snapshot) => snapshot.hasData
                   ? profileInfo(

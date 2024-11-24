@@ -38,7 +38,7 @@ class ServicesPage extends StatelessWidget {
         child: StreamBuilder(
             stream: FirebaseFirestore.instance
                 .collection('worker')
-                .where('service', isEqualTo: service)
+                .where('service_category', isEqualTo: service)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {

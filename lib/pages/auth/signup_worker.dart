@@ -6,13 +6,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
-import 'package:freelance/components/input.dart';
-import 'package:freelance/components/profile_image.dart';
-import 'package:freelance/pages/auth_page.dart';
-import 'package:freelance/pages/authenticated.dart';
-import 'package:freelance/pages/auth/login.dart';
-import 'package:freelance/utils/google_drive.dart';
-import 'package:freelance/utils/route.dart';
+import 'package:ngooli/components/input.dart';
+import 'package:ngooli/components/profile_image.dart';
+import 'package:ngooli/pages/auth_page.dart';
+import 'package:ngooli/pages/authenticated.dart';
+import 'package:ngooli/pages/auth/login.dart';
+import 'package:ngooli/utils/google_drive.dart';
+import 'package:ngooli/utils/route.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SignupWorker extends StatefulWidget {

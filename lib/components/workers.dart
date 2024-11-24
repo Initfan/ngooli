@@ -2,9 +2,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/components/card_worker.dart';
-import 'package:freelance/pages/home/worker_detail.dart';
-import 'package:freelance/utils/route.dart';
+import 'package:ngooli/components/card_worker.dart';
+import 'package:ngooli/pages/home/worker_detail.dart';
+import 'package:ngooli/utils/route.dart';
 
 class Workers extends StatefulWidget {
   const Workers({super.key, this.onTapBookmark, this.service});

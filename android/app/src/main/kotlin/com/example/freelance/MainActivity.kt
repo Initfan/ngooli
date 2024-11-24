@@ -1,4 +1,4 @@
-package com.example.freelance
+package com.example.ngooli
 
 import io.flutter.embedding.android.FlutterActivity
 

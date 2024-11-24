@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/components/title.dart';
+import 'package:ngooli/components/title.dart';
 import 'package:intl/intl.dart';
 
 class CalendarPage extends StatefulWidget {

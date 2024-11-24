@@ -2,9 +2,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/components/bookmark.dart';
-import 'package:freelance/model/worker.dart';
-import 'package:freelance/utils/currency.dart';
+import 'package:ngooli/components/bookmark.dart';
+import 'package:ngooli/model/worker.dart';
+import 'package:ngooli/utils/currency.dart';
 
 class CardWorker extends StatelessWidget {
   const CardWorker({

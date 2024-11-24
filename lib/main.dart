@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:freelance/firebase_options.dart';
-import 'package:freelance/model/user.dart';
-import 'package:freelance/pages/auth_page.dart';
-import 'package:freelance/pages/authenticated.dart';
-import 'package:freelance/pages/home/home_user.dart';
-import 'package:freelance/pages/worker/home_worker.dart';
+import 'package:ngooli/firebase_options.dart';
+import 'package:ngooli/model/user.dart';
+import 'package:ngooli/pages/auth_page.dart';
+import 'package:ngooli/pages/authenticated.dart';
+import 'package:ngooli/pages/home/home_user.dart';
+import 'package:ngooli/pages/worker/home_worker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 

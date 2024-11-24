@@ -2,14 +2,14 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/components/input.dart';
-import 'package:freelance/model/user.dart';
-import 'package:freelance/pages/booking/booking_summary.dart';
-import 'package:freelance/pages/home/home_user.dart';
-import 'package:freelance/utils/currency.dart';
-import 'package:freelance/utils/route.dart';
+import 'package:ngooli/components/input.dart';
+import 'package:ngooli/model/user.dart';
+import 'package:ngooli/pages/booking/booking_summary.dart';
+import 'package:ngooli/pages/home/home_user.dart';
+import 'package:ngooli/utils/currency.dart';
+import 'package:ngooli/utils/route.dart';
 import 'package:midtrans_sdk/midtrans_sdk.dart';
-import 'package:freelance/utils/midtrans.dart';
+import 'package:ngooli/utils/midtrans.dart';
 import 'package:provider/provider.dart';
 
 class BookingDetail extends StatefulWidget {

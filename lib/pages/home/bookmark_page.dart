@@ -2,9 +2,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/components/card_worker.dart';
-import 'package:freelance/components/service.dart';
-import 'package:freelance/components/workers.dart';
+import 'package:ngooli/components/card_worker.dart';
+import 'package:ngooli/components/service.dart';
+import 'package:ngooli/components/workers.dart';
 
 class BookmarkPage extends StatefulWidget {
   const BookmarkPage({super.key});

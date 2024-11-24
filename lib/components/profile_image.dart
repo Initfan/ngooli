@@ -5,7 +5,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:freelance/utils/google_drive.dart';
+import 'package:ngooli/utils/google_drive.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 

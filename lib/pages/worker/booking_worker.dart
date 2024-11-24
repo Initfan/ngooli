@@ -2,8 +2,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/model/user.dart';
-import 'package:freelance/pages/worker/booking_worker_list.dart';
+import 'package:ngooli/model/user.dart';
+import 'package:ngooli/pages/worker/booking_worker_list.dart';
 import 'package:provider/provider.dart';
 
 class BookingWorker extends StatefulWidget {

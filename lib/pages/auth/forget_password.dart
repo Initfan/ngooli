@@ -3,9 +3,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
-import 'package:freelance/components/button.dart';
-import 'package:freelance/components/input.dart';
-import 'package:freelance/pages/auth_page.dart';
+import 'package:ngooli/components/button.dart';
+import 'package:ngooli/components/input.dart';
+import 'package:ngooli/pages/auth_page.dart';
 
 class ForgetPassword extends StatefulWidget {
   const ForgetPassword({super.key});

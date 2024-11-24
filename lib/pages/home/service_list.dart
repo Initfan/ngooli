@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/pages/home/services_page.dart';
+import 'package:ngooli/pages/home/services_page.dart';
 
 class ServicesList extends StatelessWidget {
   const ServicesList({super.key});

@@ -3,17 +3,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/components/event.dart';
-import 'package:freelance/pages/home/bookmark_page.dart';
-import 'package:freelance/pages/home/notification_page.dart';
-import 'package:freelance/components/title.dart';
-import 'package:freelance/model/user.dart';
-import 'package:freelance/pages/home/offer_page.dart';
-import 'package:freelance/pages/home/worker_list.dart';
-import 'package:freelance/pages/home/popular_page.dart';
-import 'package:freelance/pages/home/search_page.dart';
-import 'package:freelance/pages/home/service_list.dart';
-import 'package:freelance/pages/home/services_page.dart';
+import 'package:ngooli/components/event.dart';
+import 'package:ngooli/pages/home/bookmark_page.dart';
+import 'package:ngooli/pages/home/notification_page.dart';
+import 'package:ngooli/components/title.dart';
+import 'package:ngooli/model/user.dart';
+import 'package:ngooli/pages/home/offer_page.dart';
+import 'package:ngooli/pages/home/worker_list.dart';
+import 'package:ngooli/pages/home/popular_page.dart';
+import 'package:ngooli/pages/home/search_page.dart';
+import 'package:ngooli/pages/home/service_list.dart';
+import 'package:ngooli/pages/home/services_page.dart';
 
 import 'package:provider/provider.dart';
 

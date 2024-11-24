@@ -3,8 +3,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/model/user.dart';
-import 'package:freelance/pages/inbox/inbox_detail_page.dart';
+import 'package:ngooli/model/user.dart';
+import 'package:ngooli/pages/inbox/inbox_detail_page.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 

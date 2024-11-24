@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/components/button.dart';
+import 'package:ngooli/components/button.dart';
 import 'package:intl/intl.dart';
 
 class BookingComplete extends StatefulWidget {

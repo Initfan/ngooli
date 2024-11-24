@@ -1,8 +1,8 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
-import 'package:freelance/pages/home/search_page.dart';
-import 'package:freelance/pages/home/worker_list.dart';
+import 'package:ngooli/pages/home/search_page.dart';
+import 'package:ngooli/pages/home/worker_list.dart';
 
 class PopularPage extends StatelessWidget {
   const PopularPage({super.key});

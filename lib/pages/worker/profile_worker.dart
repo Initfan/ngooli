@@ -3,12 +3,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:freelance/components/profile_image.dart';
-import 'package:freelance/model/user.dart';
-import 'package:freelance/pages/auth_page.dart';
-import 'package:freelance/pages/worker/profile_worker_update.dart';
-import 'package:freelance/pages/worker/service.dart';
-import 'package:freelance/utils/route.dart';
+import 'package:ngooli/components/profile_image.dart';
+import 'package:ngooli/model/user.dart';
+import 'package:ngooli/pages/auth_page.dart';
+import 'package:ngooli/pages/worker/profile_worker_update.dart';
+import 'package:ngooli/pages/worker/service.dart';
+import 'package:ngooli/utils/route.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 

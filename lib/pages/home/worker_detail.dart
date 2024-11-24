@@ -2,15 +2,15 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/components/bookmark.dart';
-import 'package:freelance/components/button.dart';
-import 'package:freelance/components/review.dart';
-import 'package:freelance/model/user.dart';
-import 'package:freelance/model/worker.dart';
-import 'package:freelance/pages/booking/booking_service.dart';
-import 'package:freelance/pages/inbox/inbox_detail_page.dart';
-import 'package:freelance/utils/currency.dart';
-import 'package:freelance/utils/route.dart';
+import 'package:ngooli/components/bookmark.dart';
+import 'package:ngooli/components/button.dart';
+import 'package:ngooli/components/review.dart';
+import 'package:ngooli/model/user.dart';
+import 'package:ngooli/model/worker.dart';
+import 'package:ngooli/pages/booking/booking_service.dart';
+import 'package:ngooli/pages/inbox/inbox_detail_page.dart';
+import 'package:ngooli/utils/currency.dart';
+import 'package:ngooli/utils/route.dart';
 import 'package:provider/provider.dart';
 
 class WorkerDetail extends StatelessWidget {

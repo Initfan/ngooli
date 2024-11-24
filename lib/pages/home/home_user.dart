@@ -1,11 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:freelance/pages/home/home_page.dart';
-import 'package:freelance/pages/inbox_page.dart';
-import 'package:freelance/pages/profile_page.dart';
-import 'package:freelance/pages/booking_page.dart';
-import 'package:freelance/pages/calendar_page.dart';
+import 'package:ngooli/pages/home/home_page.dart';
+import 'package:ngooli/pages/inbox_page.dart';
+import 'package:ngooli/pages/profile_page.dart';
+import 'package:ngooli/pages/booking_page.dart';
+import 'package:ngooli/pages/calendar_page.dart';
 
 class HomeUser extends StatefulWidget {
   HomeUser({super.key, this.selected = 0});

@@ -2,10 +2,10 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/pages/inbox_page.dart';
-import 'package:freelance/pages/worker/home_worker_page.dart';
-import 'package:freelance/pages/worker/profile_worker.dart';
-import 'package:freelance/pages/worker/booking_worker.dart';
+import 'package:ngooli/pages/inbox_page.dart';
+import 'package:ngooli/pages/worker/home_worker_page.dart';
+import 'package:ngooli/pages/worker/profile_worker.dart';
+import 'package:ngooli/pages/worker/booking_worker.dart';
 
 class HomeWorker extends StatefulWidget {
   HomeWorker({super.key, this.selected = 0});

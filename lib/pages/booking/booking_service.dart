@@ -3,8 +3,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/pages/booking/booking_detail.dart';
-import 'package:freelance/utils/route.dart';
+import 'package:ngooli/pages/booking/booking_detail.dart';
+import 'package:ngooli/utils/route.dart';
 import 'package:intl/intl.dart';
 
 class BookingService extends StatefulWidget {

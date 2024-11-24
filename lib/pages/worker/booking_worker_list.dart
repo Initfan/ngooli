@@ -2,10 +2,10 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:freelance/model/user.dart';
-import 'package:freelance/pages/inbox/inbox_detail_page.dart';
-import 'package:freelance/pages/worker/booking_complete.dart';
-import 'package:freelance/utils/route.dart';
+import 'package:ngooli/model/user.dart';
+import 'package:ngooli/pages/inbox/inbox_detail_page.dart';
+import 'package:ngooli/pages/worker/booking_complete.dart';
+import 'package:ngooli/utils/route.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

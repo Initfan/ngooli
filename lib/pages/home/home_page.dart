@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:freelance/components/event.dart';
-import 'package:freelance/components/workers.dart';
 import 'package:freelance/pages/home/bookmark_page.dart';
 import 'package:freelance/pages/home/notification_page.dart';
 import 'package:freelance/components/title.dart';

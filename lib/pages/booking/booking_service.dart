@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:freelance/pages/booking/booking_detail.dart';
+import 'package:freelance/utils/route.dart';
 import 'package:intl/intl.dart';
 
 class BookingService extends StatefulWidget {
@@ -48,18 +49,18 @@ class _BookingServiceState extends State<BookingService> {
       'user_id': userId,
       'worker': widget.worker.reference,
       'status': 'menunggu',
-      'payment_status': 'uncompleted',
-      'price': totalPrice + (totalPrice * 0.05),
+      'payment_status': 'unpaid',
+      'price': totalPrice,
     });
+
+    final booking = await data.get();
     setState(() => _loading = !_loading);
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => BookingDetail(
-          totalPrice: totalPrice,
-          bookingId: data.id,
-        ),
-      ),
+      materialRoute(BookingDetail(
+        booking: booking,
+        worker: widget.worker,
+      )),
     );
   }
 
@@ -84,7 +85,7 @@ class _BookingServiceState extends State<BookingService> {
         child: Row(
           children: [
             Expanded(
-              child: Text("${currency.format(totalPrice)} + 5%"),
+              child: Text(currency.format(totalPrice)),
             ),
             SizedBox(width: 15),
             ElevatedButton(

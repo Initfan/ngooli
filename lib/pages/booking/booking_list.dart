@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freelance/components/create_review.dart';
 import 'package:freelance/model/user.dart';
+import 'package:freelance/pages/booking/booking_receipt.dart';
 import 'package:freelance/pages/inbox/inbox_detail_page.dart';
 import 'package:freelance/utils/route.dart';
 import 'package:intl/intl.dart';
@@ -132,7 +133,7 @@ class BookingList extends StatelessWidget {
                             ),
                           ],
                         ),
-                        if (bookingData['payment_status'] == 'done' &&
+                        if (bookingData['payment_status'] == 'paid' &&
                             bookingData['status'] != 'selesai')
                           IconButton.filledTonal(
                             // onPressed: null,
@@ -161,46 +162,72 @@ class BookingList extends StatelessWidget {
     );
   }
 
-  Column _bookingInfo(
+  Widget _bookingInfo(
     Timestamp date,
     QueryDocumentSnapshot<Map<String, dynamic>> bookingData,
     Map<String, dynamic> _data,
     DocumentReference<Object?> worker,
   ) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text("Tanggal"),
-            Text(DateFormat('EEEE d MMM, yyyy').format(date.toDate())),
-          ],
-        ),
-        SizedBox(height: 15),
-        Row(
-          children: [
-            Text("Alamat"),
-            Spacer(),
-            Expanded(
-              child: Text(
-                _data['address'],
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+    final workingHour = bookingData['working_hour'] +
+        int.parse(bookingData['working_time'].toString().split(':')[0]);
+    return Builder(builder: (context) {
+      return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Tanggal"),
+              Text.rich(
+                TextSpan(
+                  text: DateFormat('MMM d, yyyy | ').format(date.toDate()),
+                  children: [
+                    TextSpan(text: bookingData['working_time']),
+                    TextSpan(text: ' - '),
+                    TextSpan(
+                      text: "${workingHour.toString()}:00",
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 15),
-        if (_data['status'] == 'Completed') button('Detail', false),
-        if (_data['payment_status'] == 'uncompleted')
-          button('Bayar pesanan', true),
-        if (_data.containsKey('reviewed') && !_data['reviewed'])
-          CreateReview(
-            worker: worker,
-            booking: bookingData.reference,
-          )
-      ],
-    );
+            ],
+          ),
+          SizedBox(height: 15),
+          Row(
+            children: [
+              Text("Alamat"),
+              Spacer(),
+              Expanded(
+                child: Text(
+                  _data['address'],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 15),
+          if (_data['status'] == 'Completed') button('Detail', false),
+          if (_data['payment_status'] == 'unpaid')
+            button('Bayar pesanan', true),
+          if (_data['payment_status'] == 'paid')
+            GestureDetector(
+                onTap: () async {
+                  final _worker = await worker.get();
+                  Navigator.push(
+                    context,
+                    materialRoute(
+                        BookingReceipt(worker: _worker, booking: bookingData)),
+                  );
+                },
+                child: button('Lihat resi', true)),
+          if (_data.containsKey('reviewed') && !_data['reviewed'])
+            CreateReview(
+              worker: worker,
+              booking: bookingData.reference,
+            )
+        ],
+      );
+    });
   }
 
   Container button(String text, bool solid) {

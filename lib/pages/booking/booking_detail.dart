@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freelance/components/input.dart';
 import 'package:freelance/model/user.dart';
+import 'package:freelance/pages/booking/booking_summary.dart';
 import 'package:freelance/pages/home/home_user.dart';
 import 'package:freelance/utils/currency.dart';
 import 'package:freelance/utils/route.dart';
@@ -14,12 +15,12 @@ import 'package:provider/provider.dart';
 class BookingDetail extends StatefulWidget {
   const BookingDetail({
     super.key,
-    required this.totalPrice,
-    required this.bookingId,
+    required this.booking,
+    required this.worker,
   });
 
-  final int totalPrice;
-  final String bookingId;
+  final DocumentSnapshot booking;
+  final DocumentSnapshot worker;
 
   @override
   State<BookingDetail> createState() => _BookingDetailState();
@@ -27,41 +28,11 @@ class BookingDetail extends StatefulWidget {
 
 class _BookingDetailState extends State<BookingDetail> {
   bool _loading = false;
-  MidtransSDK? _midtrans;
   int currentQuantity = 0;
   TimeOfDay time = TimeOfDay.now();
   DateTime date = DateTime.now();
 
-  @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    if (_midtrans == null) {
-      final midtrans = await initializeMidtrans(context);
-      midtrans.setTransactionFinishedCallback((result) async {
-        await FirebaseFirestore.instance
-            .collection('booking')
-            .doc(widget.bookingId)
-            .update({
-          'payment_status': 'done',
-          'payment_type': result.paymentType,
-          'status_message': result.statusMessage,
-        });
-        Navigator.pushReplacement(
-          context,
-          materialRoute(HomeUser(selected: 1)),
-        );
-      });
-      setState(() => _midtrans = midtrans);
-    }
-  }
-
-  @override
-  void dispose() {
-    _midtrans?.removeTransactionFinishedCallback();
-    super.dispose();
-  }
-
-  Future bookingPayment() async {
+  void saveBooking() async {
     setState(() => _loading = !_loading);
     final currentUser = Provider.of<UserModel>(context, listen: false).user!;
     final user = await FirebaseFirestore.instance
@@ -70,34 +41,21 @@ class _BookingDetailState extends State<BookingDetail> {
         .get();
 
     final data = {
-      'address': user.get('address') ?? '',
+      'address': user.get('address'),
       'date': date,
-      'working_hour': "${time.hour}:${time.minute == 0 ? '00' : time.minute}",
-      'working_time': currentQuantity,
+      'working_time': "${time.hour}:${time.minute == 0 ? '00' : time.minute}",
+      'working_hour': currentQuantity,
     };
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('booking')
-          .doc(widget.bookingId)
-          .update(data);
-
-      final token = await createTransaction(
-        widget.bookingId,
-        widget.totalPrice + (widget.totalPrice * 0.05),
-        {
-          'first_name': currentUser.displayName,
-          'email': currentUser.email,
-        },
-      );
-      print(token);
-      setState(() => _loading = !_loading);
-      print(_midtrans);
-      _midtrans!.startPaymentUiFlow(token: token);
-    } catch (e) {
-      setState(() => _loading = !_loading);
-      print(e);
-    }
+    await widget.booking.reference.update(data);
+    final booking = await widget.booking.reference.get();
+    setState(() => _loading = !_loading);
+    Navigator.push(
+      context,
+      materialRoute(BookingSummary(
+        worker: widget.worker,
+        booking: booking,
+      )),
+    );
   }
 
   @override
@@ -116,16 +74,12 @@ class _BookingDetailState extends State<BookingDetail> {
         child: Row(
           children: [
             Expanded(
-              child: Text(currency.format(
-                widget.totalPrice + (widget.totalPrice * 0.05),
-              )),
+              child: Text(currency.format(widget.booking['price'])),
             ),
             SizedBox(width: 15),
             ElevatedButton(
-              onPressed: () {
-                bookingPayment();
-              },
-              child: Text(_loading ? 'Loading...' : 'Bayar'),
+              onPressed: saveBooking,
+              child: Text(_loading ? 'Loading...' : 'Continue'),
             ),
           ],
         ),

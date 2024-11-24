@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:freelance/components/profile_image.dart';
 import 'package:freelance/model/user.dart';
-import 'package:freelance/pages/auth_page.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
@@ -16,15 +15,16 @@ class ProfilePage extends StatelessWidget {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
     Provider.of<UserModel>(context, listen: false).logout();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => AuthPage()),
-    );
+    Navigator.pushReplacementNamed(context, '/auth');
   }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserModel>(context).user;
+    if (user == null) {
+      return SizedBox();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
@@ -46,6 +46,7 @@ class ProfilePage extends StatelessWidget {
                     )
                   : SizedBox(),
             ),
+            SizedBox(height: 20),
             ListTile(
               leading: Icon(
                 Icons.logout,

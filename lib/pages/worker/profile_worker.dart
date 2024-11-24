@@ -28,6 +28,9 @@ class ProfileWorker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserModel>(context).user;
+    if (user == null) {
+      return SizedBox();
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
@@ -60,17 +63,32 @@ class ProfileWorker extends StatelessWidget {
                   children: [
                     profileInfo(data, user, worker, context),
                     SizedBox(height: 20),
+                    if (!worker['profile_completed'])
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          materialRoute(ProfileWorkerUpdate(worker: worker)),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          width: double.maxFinite,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.redAccent,
+                          ),
+                          child: Center(
+                            child: Text(
+                                'Lengkapi profile untuk dapat menerima pesanan'),
+                          ),
+                        ),
+                      ),
                     ListView(
                       shrinkWrap: true,
                       children: [
                         ListTile(
                           onTap: () => Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => MyService(
-                                worker: worker.reference,
-                              ),
-                            ),
+                            materialRoute(MyService(worker: worker.reference)),
                           ),
                           leading: Icon(Icons.cleaning_services_outlined),
                           title: Text('Layanan ku'),

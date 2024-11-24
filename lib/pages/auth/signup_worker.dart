@@ -77,6 +77,7 @@ class _SignupPageState extends State<SignupWorker> {
       'photo_url': fileLink,
       'service': service.text,
       'service_category': selectedService,
+      'balance': 0,
     });
   }
 

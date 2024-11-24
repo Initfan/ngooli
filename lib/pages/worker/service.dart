@@ -68,9 +68,6 @@ class _MyServiceState extends State<MyService> {
                     Expanded(
                       child: Button(
                         onTap: () async {
-                          await widget.worker.update({
-                            'profile_completed': true,
-                          });
                           await widget.worker.collection('services').add({
                             'name': name.text,
                             'price': int.parse(price.text),

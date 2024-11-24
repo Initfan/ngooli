@@ -80,6 +80,9 @@ class _ProfileWorkerUpdateState extends State<ProfileWorkerUpdate> {
         'documentation': uploadedImage,
       });
       setState(() => loadingUpload = !loadingUpload);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Berhasil update profile')),
+      );
       return true;
     } catch (e) {
       print(e);
@@ -106,18 +109,6 @@ class _ProfileWorkerUpdateState extends State<ProfileWorkerUpdate> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (!widget.worker['profile_completed'])
-              Container(
-                padding: EdgeInsets.all(5),
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.redAccent,
-                ),
-                child: Center(
-                  child: Text('Lengkapi profile untuk dapat menerima pesanan'),
-                ),
-              ),
             SizedBox(height: 15),
             Center(
               child: ProfileImage(
@@ -154,6 +145,7 @@ class _ProfileWorkerUpdateState extends State<ProfileWorkerUpdate> {
   }
 
   Widget _buildDocumentation(BuildContext context) {
+    final _data = widget.worker.data() as Map;
     return Column(
       children: [
         Row(
@@ -168,7 +160,7 @@ class _ProfileWorkerUpdateState extends State<ProfileWorkerUpdate> {
             ),
           ],
         ),
-        if (imageList != null || widget.worker['documentation'] != null)
+        if (imageList != null || _data.containsKey('documentation'))
           GridView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),

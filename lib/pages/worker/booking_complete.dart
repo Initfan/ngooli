@@ -1,15 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freelance/components/button.dart';
-import 'package:freelance/pages/worker/booking_worker.dart';
-import 'package:freelance/pages/worker/home_worker.dart';
-import 'package:freelance/utils/google_drive.dart';
-import 'package:freelance/utils/route.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class BookingComplete extends StatefulWidget {

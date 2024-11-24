@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class InboxPage extends StatefulWidget {
-  const InboxPage({super.key});
+  const InboxPage({super.key, required this.role});
+
+  final String role;
 
   @override
   State<InboxPage> createState() => _InboxPageState();
@@ -18,43 +20,27 @@ class InboxPage extends StatefulWidget {
 class _InboxPageState extends State<InboxPage> {
   @override
   Widget build(BuildContext context) {
-    final currentUser = Provider.of<UserModel>(context).user;
+    final user = Provider.of<UserModel>(context).user!;
     return Scaffold(
       appBar: AppBar(
         title: Text("Inbox"),
       ),
-      body: FutureBuilder(
-        future: FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser!.uid)
-            .get(),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('chat')
+            .where('user_id', isEqualTo: user.uid)
+            .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
           }
-
-          final role = snapshot.data!['role'];
-          return StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection('chat')
-                .where(
-                  role == 'user' ? 'user_id' : 'worker_id',
-                  isEqualTo: snapshot.data!.id,
-                )
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Center(child: CircularProgressIndicator());
-              }
-              return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  final data = snapshot.data!.docs[index];
-                  final uid =
-                      role == 'user' ? data['worker_id'] : data['user_id'];
-                  return _card(currentUser, uid, data, role);
-                },
-              );
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              final data = snapshot.data!.docs[index];
+              final uid =
+                  widget.role == 'user' ? data['worker_id'] : data['user_id'];
+              return _card(user, data, uid);
             },
           );
         },
@@ -62,86 +48,87 @@ class _InboxPageState extends State<InboxPage> {
     );
   }
 
-  FutureBuilder _card(
+  Widget _card(
     User currentUser,
-    String uid,
     DocumentSnapshot chat,
-    String role,
+    String uid,
   ) {
-    return FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
-        builder: (context, snapshot) {
-          return Skeletonizer(
-            enabled: !snapshot.hasData,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => InboxDetailPage(
-                      name: snapshot.data!['name'] ?? 'username',
-                      uid: currentUser.uid,
-                      role: role,
+    return StreamBuilder(
+      stream:
+          FirebaseFirestore.instance.collection('users').doc(uid).snapshots(),
+      builder: (context, snapshot) {
+        return Skeletonizer(
+          enabled: !snapshot.hasData,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => InboxDetailPage(
+                    name: snapshot.data!['name'],
+                    userId: currentUser.uid,
+                    workerId: chat['worker_id'],
+                    role: widget.role,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.all(15),
+              child: Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.grey[900],
+                      image: DecorationImage(
+                        image: NetworkImage(snapshot.data?['photo_url'] ?? ''),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.all(15),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        color: Colors.grey[900],
-                        image: DecorationImage(
-                          image:
-                              NetworkImage(snapshot.data?['photo_url'] ?? ''),
-                          fit: BoxFit.cover,
+                  SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              snapshot.data?['name'] ?? 'username',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            Spacer(),
+                            // Badge(label: Text('4'))
+                          ],
                         ),
-                      ),
+                        SizedBox(height: 3),
+                        Row(
+                          children: [
+                            Text(
+                              chat['last_chat'],
+                              style: Theme.of(context).textTheme.labelMedium,
+                            ),
+                            Spacer(),
+                            Text(
+                              '10:34',
+                              style: Theme.of(context).textTheme.labelMedium,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                snapshot.data?['name'] ?? 'username',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Spacer(),
-                              // Badge(label: Text('4'))
-                            ],
-                          ),
-                          SizedBox(height: 3),
-                          Row(
-                            children: [
-                              Text(
-                                chat['last_chat'],
-                                style: Theme.of(context).textTheme.labelMedium,
-                              ),
-                              Spacer(),
-                              Text(
-                                '10:34',
-                                style: Theme.of(context).textTheme.labelMedium,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }

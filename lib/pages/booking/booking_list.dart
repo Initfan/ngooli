@@ -141,7 +141,8 @@ class BookingList extends StatelessWidget {
                               materialRoute(
                                 InboxDetailPage(
                                   name: snapshot.data!['name'],
-                                  uid: user.uid,
+                                  userId: user.uid,
+                                  workerId: snapshot.data!['user_id'],
                                   role: 'user',
                                 ),
                               ),

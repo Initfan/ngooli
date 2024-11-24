@@ -22,7 +22,7 @@ class _HomeUserState extends State<HomeWorker> {
   List<Widget> pages = [
     HomeWorkerPage(),
     BookingWorker(),
-    InboxPage(),
+    InboxPage(role: 'worker'),
     ProfileWorker(),
   ];
 

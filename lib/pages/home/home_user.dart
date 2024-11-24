@@ -21,7 +21,7 @@ class _HomeUserState extends State<HomeUser> {
     HomePage(),
     BookingPage(),
     CalendarPage(),
-    InboxPage(),
+    InboxPage(role: 'user'),
     ProfilePage()
   ];
 

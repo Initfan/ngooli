@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:freelance/components/bookmark.dart';
 import 'package:freelance/components/button.dart';
 import 'package:freelance/components/review.dart';
+import 'package:freelance/model/user.dart';
 import 'package:freelance/model/worker.dart';
 import 'package:freelance/pages/booking/booking_service.dart';
 import 'package:freelance/pages/inbox/inbox_detail_page.dart';
 import 'package:freelance/utils/currency.dart';
 import 'package:freelance/utils/route.dart';
+import 'package:provider/provider.dart';
 
 class WorkerDetail extends StatelessWidget {
   const WorkerDetail({super.key, required this.worker});
@@ -18,6 +20,7 @@ class WorkerDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserModel>(context).user!;
     final Worker _worker = Worker.fromJson(
       worker.data() as Map<String, dynamic>,
     );
@@ -41,19 +44,20 @@ class WorkerDetail extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10),
-            // IconButton.filledTonal(
-            //   onPressed: () => Navigator.push(
-            //     context,
-            //     materialRoute(
-            //       InboxDetailPage(
-            //         name: worker['name'],
-            //         data: worker,
-            //         role: 'user',
-            //       ),
-            //     ),
-            //   ),
-            //   icon: Icon(Icons.chat_outlined),
-            // )
+            IconButton.filledTonal(
+              onPressed: () => Navigator.push(
+                context,
+                materialRoute(
+                  InboxDetailPage(
+                    name: worker['name'],
+                    userId: user.uid,
+                    workerId: worker['user_id'],
+                    role: 'user',
+                  ),
+                ),
+              ),
+              icon: Icon(Icons.chat_outlined),
+            )
           ],
         ),
       ),

@@ -6,16 +6,18 @@ import 'package:freelance/components/input.dart';
 import 'package:intl/intl.dart';
 
 class InboxDetailPage extends StatefulWidget {
-  InboxDetailPage({
+  const InboxDetailPage({
     super.key,
     required this.name,
     required this.role,
-    required this.uid,
+    required this.userId,
+    required this.workerId,
   });
 
   final String name;
   final String role;
-  final String uid;
+  final String userId;
+  final String workerId;
 
   @override
   State<InboxDetailPage> createState() => _InboxDetailPageState();
@@ -25,22 +27,35 @@ class _InboxDetailPageState extends State<InboxDetailPage> {
   final controller = TextEditingController();
 
   DocumentSnapshot? inbox;
-  String get id => widget.role == 'user' ? 'user_id' : 'worker_id';
+
+  Map get chat => {
+        'from': widget.role,
+        'message': controller.text,
+        'timestamp': Timestamp.now(),
+      };
+
+  void newMessage() async {
+    final data = {
+      'chat': [chat],
+      'last_chat': controller.text,
+      'last_chat_time': Timestamp.now(),
+      'user_id': widget.userId,
+      'worker_id': widget.workerId,
+    };
+    FirebaseFirestore.instance.collection('chat').add(data);
+  }
 
   void sendMessage() async {
+    if (inbox == null) {
+      newMessage();
+    }
+
     final inboxData = inbox!.data() as Map;
     try {
       if (inboxData.containsKey('chat')) {
         inbox!.reference.update(
           {
-            'chat': [
-              ...inbox!['chat'],
-              {
-                'from': widget.role,
-                'message': controller.text,
-                'timestamp': Timestamp.now(),
-              }
-            ],
+            'chat': [...inbox!['chat'], chat],
             'last_chat': controller.text,
             'last_chat_time': Timestamp.now()
           },
@@ -48,13 +63,7 @@ class _InboxDetailPageState extends State<InboxDetailPage> {
       } else {
         inbox!.reference.update(
           {
-            'chat': [
-              {
-                'from': widget.role,
-                'message': controller.text,
-                'timestamp': Timestamp.now(),
-              }
-            ],
+            'chat': [chat],
             'last_chat': controller.text,
             'last_chat_time': Timestamp.now()
           },
@@ -78,7 +87,7 @@ class _InboxDetailPageState extends State<InboxDetailPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Expanded(child: chat(id)),
+            Expanded(child: _buildChat()),
             Row(
               children: [
                 Expanded(
@@ -97,15 +106,19 @@ class _InboxDetailPageState extends State<InboxDetailPage> {
     );
   }
 
-  Widget chat(String id) {
+  Widget _buildChat() {
     return Column(
       children: [
         StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection('chat')
-              .where(id, isEqualTo: widget.uid)
+              .where('user_id', isEqualTo: widget.userId)
+              .where('worker_id', isEqualTo: widget.workerId)
               .snapshots(),
           builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return SizedBox();
+            }
             final data = snapshot.data!.docs.first;
             inbox = data;
             if (data.data().containsKey('chat')) {

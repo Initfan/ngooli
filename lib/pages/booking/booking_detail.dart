@@ -1,14 +1,15 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'dart:convert';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:freelance/components/input.dart';
+import 'package:freelance/model/user.dart';
+import 'package:freelance/pages/home/home_user.dart';
 import 'package:freelance/utils/currency.dart';
+import 'package:freelance/utils/route.dart';
 import 'package:midtrans_sdk/midtrans_sdk.dart';
-import 'package:http/http.dart' as http;
 import 'package:freelance/utils/midtrans.dart';
+import 'package:provider/provider.dart';
 
 class BookingDetail extends StatefulWidget {
   const BookingDetail({
@@ -28,13 +29,29 @@ class _BookingDetailState extends State<BookingDetail> {
   bool _loading = false;
   MidtransSDK? _midtrans;
   int currentQuantity = 0;
-  TimeOfDay? time;
+  TimeOfDay time = TimeOfDay.now();
+  DateTime date = DateTime.now();
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     if (_midtrans == null) {
-      initializeMidtrans(context);
+      final midtrans = await initializeMidtrans(context);
+      midtrans.setTransactionFinishedCallback((result) async {
+        await FirebaseFirestore.instance
+            .collection('booking')
+            .doc(widget.bookingId)
+            .update({
+          'payment_status': 'done',
+          'payment_type': result.paymentType,
+          'status_message': result.statusMessage,
+        });
+        Navigator.pushReplacement(
+          context,
+          materialRoute(HomeUser(selected: 1)),
+        );
+      });
+      setState(() => _midtrans = midtrans);
     }
   }
 
@@ -45,46 +62,37 @@ class _BookingDetailState extends State<BookingDetail> {
   }
 
   Future bookingPayment() async {
+    setState(() => _loading = !_loading);
+    final currentUser = Provider.of<UserModel>(context, listen: false).user!;
+    final user = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .get();
+
+    final data = {
+      'address': user.get('address') ?? '',
+      'date': date,
+      'working_hour': "${time.hour}:${time.minute == 0 ? '00' : time.minute}",
+      'working_time': currentQuantity,
+    };
+
     try {
-      setState(() => _loading = !_loading);
-      // final data = {
-      //   'date': date,
-      //   'address': {
-      //     'longitude': position?.longitude,
-      //     'latitude': position?.latitude,
-      //   },
-      // };
+      await FirebaseFirestore.instance
+          .collection('booking')
+          .doc(widget.bookingId)
+          .update(data);
 
-      // await FirebaseFirestore.instance
-      //     .collection('booking')
-      //     .doc(widget.bookingId)
-      //     .update(data);
-
-      final key = dotenv.env['MIDTRANS_SERVER_KEY']!;
-      final res = await http.post(
-        Uri.parse("https://app.sandbox.midtrans.com/snap/v1/transactions"),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Basic ${base64Encode(utf8.encode(key))}:',
+      final token = await createTransaction(
+        widget.bookingId,
+        widget.totalPrice + (widget.totalPrice * 0.05),
+        {
+          'first_name': currentUser.displayName,
+          'email': currentUser.email,
         },
-        body: jsonEncode(
-          {
-            "transaction_details": {
-              "order_id": widget.bookingId,
-              "gross_amount": widget.totalPrice + (widget.totalPrice * 0.05),
-            },
-            "credit_card": {"secure": true},
-            "customer_details": {
-              "first_name": "budi",
-              "last_name": "pratama",
-              "email": "budi.pra@example.com",
-              "phone": "08111222333"
-            },
-          },
-        ),
       );
+      print(token);
       setState(() => _loading = !_loading);
-      final token = jsonDecode(res.body)['token'];
+      print(_midtrans);
       _midtrans!.startPaymentUiFlow(token: token);
     } catch (e) {
       setState(() => _loading = !_loading);
@@ -122,7 +130,7 @@ class _BookingDetailState extends State<BookingDetail> {
           ],
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,7 +143,9 @@ class _BookingDetailState extends State<BookingDetail> {
               initialDate: DateTime.now(),
               firstDate: DateTime.now(),
               lastDate: DateTime(2050),
-              onDateChanged: (_) {},
+              onDateChanged: (value) {
+                setState(() => date = value);
+              },
             ),
             _buildWorkingStart(context),
             SizedBox(height: 20),
@@ -159,11 +169,11 @@ class _BookingDetailState extends State<BookingDetail> {
         ),
         Row(
           children: [
-            buttonValue(currentQuantity, 'remove', null),
+            buttonValue('remove', null),
             SizedBox(width: 10),
             Text("$currentQuantity"),
             SizedBox(width: 10),
-            buttonValue(currentQuantity, 'add', null),
+            buttonValue('add', null),
           ],
         ),
       ],
@@ -184,7 +194,7 @@ class _BookingDetailState extends State<BookingDetail> {
             onTap: () => showTimePicker(
               context: context,
               initialTime: TimeOfDay.now(),
-            ).then((value) => setState(() => time = value)),
+            ).then((value) => setState(() => time = value!)),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -197,7 +207,7 @@ class _BookingDetailState extends State<BookingDetail> {
                         : Colors.grey[900],
                   ),
                   child: Center(
-                    child: Text("10"),
+                    child: Text(time.hour.toString()),
                   ),
                 ),
                 SizedBox(width: 5),
@@ -212,7 +222,7 @@ class _BookingDetailState extends State<BookingDetail> {
                         : Colors.grey[900],
                   ),
                   child: Center(
-                    child: Text("10"),
+                    child: Text(time.minute.toString()),
                   ),
                 ),
               ],
@@ -224,7 +234,6 @@ class _BookingDetailState extends State<BookingDetail> {
   }
 
   GestureDetector buttonValue(
-    int currentQuantity,
     String action,
     BorderRadius? radius,
   ) {
@@ -232,10 +241,10 @@ class _BookingDetailState extends State<BookingDetail> {
       onTap: () {
         if (action == 'remove') {
           if (currentQuantity > 0) {
-            setState(() => currentQuantity += 1);
+            setState(() => currentQuantity -= 1);
           }
         } else {
-          setState(() => currentQuantity -= 1);
+          setState(() => currentQuantity += 1);
         }
       },
       child: Container(

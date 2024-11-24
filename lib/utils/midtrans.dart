@@ -1,36 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:midtrans_sdk/midtrans_sdk.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-Future<MidtransSDK?> initializeMidtrans(BuildContext context) async {
-  MidtransSDK? midtrans;
-  midtrans = await MidtransSDK.init(
+Future<MidtransSDK> initializeMidtrans(BuildContext context) async {
+  final midtrans = await MidtransSDK.init(
     config: MidtransConfig(
       clientKey: dotenv.env['MIDTRANS_CLIENT_KEY'] ?? "",
       merchantBaseUrl: dotenv.env['MIDTRANS_MERCHANT_BASE_URL'] ?? "",
-      colorTheme: ColorTheme(
-        colorPrimary: Theme.of(context).colorScheme.secondary,
-        colorPrimaryDark: Theme.of(context).colorScheme.secondary,
-        colorSecondary: Theme.of(context).colorScheme.secondary,
-      ),
     ),
   );
 
+  midtrans.setUIKitCustomSetting(
+    showPaymentStatus: true,
+    skipCustomerDetailsPages: true,
+  );
+
   return midtrans;
+}
 
-  // _midtrans.setUIKitCustomSetting(
-  //   skipCustomerDetailsPages: true,
-  // );
-
-  // _midtrans!.setTransactionFinishedCallback((result) async {
-  //   await FirebaseFirestore.instance
-  //       .collection('booking')
-  //       .doc(widget.bookingId)
-  //       .update({'payment_status': 'done'}).then(
-  //     (_) => Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (_) => HomeUser(selected: 1)),
-  //     ),
-  //   );
-  // });
+Future<String> createTransaction(
+  String orderId,
+  double price,
+  Map<String, dynamic> customer,
+) async {
+  final key = dotenv.env['MIDTRANS_SERVER_KEY']!;
+  final res = await http.post(
+    Uri.parse("https://app.sandbox.midtrans.com/snap/v1/transactions"),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Basic ${base64Encode(utf8.encode(key))}:',
+    },
+    body: jsonEncode(
+      {
+        "transaction_details": {
+          "order_id": orderId,
+          "gross_amount": price,
+        },
+        "credit_card": {"secure": true},
+        "customer_details": customer,
+      },
+    ),
+  );
+  return jsonDecode(res.body)['token'];
 }

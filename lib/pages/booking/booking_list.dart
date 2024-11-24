@@ -178,18 +178,7 @@ class BookingList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("Alamat"),
-            FutureBuilder<String>(
-              future: getAddress(
-                _data['address']['latitude'],
-                _data['address']['longitude'],
-              ),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Text('');
-                }
-                return Text(snapshot.data!);
-              },
-            )
+            Text(_data['address']),
           ],
         ),
         SizedBox(height: 15),

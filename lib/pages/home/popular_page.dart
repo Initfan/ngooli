@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:freelance/components/service.dart';
 import 'package:freelance/components/workers.dart';
 import 'package:freelance/pages/home/search_page.dart';
+import 'package:freelance/pages/home/worker_list.dart';
 
 class PopularPage extends StatelessWidget {
   const PopularPage({super.key});
@@ -32,16 +33,7 @@ class PopularPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(vertical: 10),
-        child: Column(
-          children: [
-            Service(),
-            SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Workers(),
-            ),
-          ],
-        ),
+        child: WorkerList(),
       ),
     );
   }

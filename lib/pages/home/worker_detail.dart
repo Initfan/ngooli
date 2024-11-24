@@ -41,19 +41,19 @@ class WorkerDetail extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10),
-            IconButton.filledTonal(
-              onPressed: () => Navigator.push(
-                context,
-                materialRoute(
-                  InboxDetailPage(
-                    name: worker['name'],
-                    data: worker,
-                    role: 'user',
-                  ),
-                ),
-              ),
-              icon: Icon(Icons.chat_outlined),
-            )
+            // IconButton.filledTonal(
+            //   onPressed: () => Navigator.push(
+            //     context,
+            //     materialRoute(
+            //       InboxDetailPage(
+            //         name: worker['name'],
+            //         data: worker,
+            //         role: 'user',
+            //       ),
+            //     ),
+            //   ),
+            //   icon: Icon(Icons.chat_outlined),
+            // )
           ],
         ),
       ),

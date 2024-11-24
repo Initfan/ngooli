@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:freelance/model/user.dart';
 import 'package:freelance/pages/inbox/inbox_detail_page.dart';
@@ -31,6 +32,7 @@ class _InboxPageState extends State<InboxPage> {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
           }
+
           final role = snapshot.data!['role'];
           return StreamBuilder(
             stream: FirebaseFirestore.instance
@@ -50,7 +52,7 @@ class _InboxPageState extends State<InboxPage> {
                   final data = snapshot.data!.docs[index];
                   final uid =
                       role == 'user' ? data['worker_id'] : data['user_id'];
-                  return _card(context, uid, data, role);
+                  return _card(currentUser, uid, data, role);
                 },
               );
             },
@@ -61,7 +63,7 @@ class _InboxPageState extends State<InboxPage> {
   }
 
   FutureBuilder _card(
-    BuildContext context,
+    User currentUser,
     String uid,
     DocumentSnapshot chat,
     String role,
@@ -69,9 +71,6 @@ class _InboxPageState extends State<InboxPage> {
     return FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
         builder: (context, snapshot) {
-          // if (!snapshot.hasData) {
-          //   return Center(child: CircularProgressIndicator());
-          // }
           return Skeletonizer(
             enabled: !snapshot.hasData,
             child: GestureDetector(
@@ -80,8 +79,8 @@ class _InboxPageState extends State<InboxPage> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => InboxDetailPage(
-                      name: snapshot.data?['name'] ?? 'username',
-                      data: chat,
+                      name: snapshot.data!['name'] ?? 'username',
+                      uid: currentUser.uid,
                       role: role,
                     ),
                   ),

@@ -2,32 +2,68 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:freelance/components/input.dart';
+import 'package:intl/intl.dart';
 
-class InboxDetailPage extends StatelessWidget {
+class InboxDetailPage extends StatefulWidget {
   InboxDetailPage({
     super.key,
     required this.name,
-    required this.data,
     required this.role,
+    required this.uid,
   });
 
   final String name;
   final String role;
-  final DocumentSnapshot data;
+  final String uid;
 
+  @override
+  State<InboxDetailPage> createState() => _InboxDetailPageState();
+}
+
+class _InboxDetailPageState extends State<InboxDetailPage> {
   final controller = TextEditingController();
 
+  DocumentSnapshot? inbox;
+  String get id => widget.role == 'user' ? 'user_id' : 'worker_id';
+
   void sendMessage() async {
-    if (controller.text.isEmpty) return;
-    await data.reference.update({
-      "chat": [
-        ...data['chat'],
-        {
-          "from": role,
-          "message": controller.text,
-        }
-      ]
-    });
+    final inboxData = inbox!.data() as Map;
+    try {
+      if (inboxData.containsKey('chat')) {
+        inbox!.reference.update(
+          {
+            'chat': [
+              ...inbox!['chat'],
+              {
+                'from': widget.role,
+                'message': controller.text,
+                'timestamp': Timestamp.now(),
+              }
+            ],
+            'last_chat': controller.text,
+            'last_chat_time': Timestamp.now()
+          },
+        );
+      } else {
+        inbox!.reference.update(
+          {
+            'chat': [
+              {
+                'from': widget.role,
+                'message': controller.text,
+                'timestamp': Timestamp.now(),
+              }
+            ],
+            'last_chat': controller.text,
+            'last_chat_time': Timestamp.now()
+          },
+        );
+      }
+    } catch (e) {
+      print(e);
+    }
+    controller.clear();
   }
 
   @override
@@ -35,37 +71,65 @@ class InboxDetailPage extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(name),
+        title: Text(widget.name),
       ),
-      body: SingleChildScrollView(
-        reverse: true,
-        padding: EdgeInsets.all(15),
-        child: StreamBuilder(
-          stream: data.reference.snapshots(),
+      body: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(child: chat(id)),
+            Row(
+              children: [
+                Expanded(
+                  child: Input(controller: controller),
+                ),
+                SizedBox(width: 15),
+                IconButton.filledTonal(
+                  onPressed: sendMessage,
+                  icon: Icon(Icons.send),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget chat(String id) {
+    return Column(
+      children: [
+        StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('chat')
+              .where(id, isEqualTo: widget.uid)
+              .snapshots(),
           builder: (context, snapshot) {
-            final _data = snapshot.data!.data() as Map;
-            if (_data.containsKey('chat')) {
+            final data = snapshot.data!.docs.first;
+            inbox = data;
+            if (data.data().containsKey('chat')) {
+              final dataLength = data['chat'].length;
               return ListView.builder(
                 shrinkWrap: true,
                 reverse: true,
-                itemCount: snapshot.data!['chat'].length,
+                itemCount: dataLength,
                 itemBuilder: (context, index) {
-                  final chat = snapshot.data!['chat'][index];
+                  final chat = snapshot.data!.docs.first['chat']
+                      [(dataLength - 1) - index];
                   return Column(
-                    crossAxisAlignment: chat['from'] == role
+                    crossAxisAlignment: chat['from'] == widget.role
                         ? CrossAxisAlignment.end
                         : CrossAxisAlignment.start,
-                    children: [
-                      chatBubble(context, chat),
-                    ],
+                    children: [chatBubble(context, chat)],
                   );
                 },
               );
             }
-            return Text('');
+            return SizedBox();
           },
         ),
-      ),
+      ],
     );
   }
 
@@ -80,7 +144,7 @@ class InboxDetailPage extends StatelessWidget {
       margin: EdgeInsets.only(top: 15),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: chat['from'] == role
+        color: chat['from'] == widget.role
             ? Colors.blueAccent.shade700
             : Colors.grey.shade900,
         borderRadius: BorderRadius.only(
@@ -94,7 +158,7 @@ class InboxDetailPage extends StatelessWidget {
         children: [
           Text(chat['message']),
           Text(
-            '10:01',
+            DateFormat('H:mm').format(chat['timestamp'].toDate()),
             style: Theme.of(context)
                 .textTheme
                 .labelSmall!

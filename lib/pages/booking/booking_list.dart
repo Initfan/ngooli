@@ -3,9 +3,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freelance/components/create_review.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:freelance/model/user.dart';
+import 'package:freelance/pages/inbox/inbox_detail_page.dart';
+import 'package:freelance/utils/route.dart';
 import 'package:intl/intl.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import 'package:provider/provider.dart';
 
 class BookingList extends StatelessWidget {
   const BookingList({
@@ -16,16 +18,6 @@ class BookingList extends StatelessWidget {
 
   final String status;
   final QuerySnapshot<Map<String, dynamic>>? booking;
-
-  Future<String> getAddress(double latitude, double longitude) async {
-    List<Placemark> placemark = await placemarkFromCoordinates(
-      latitude,
-      longitude,
-    );
-    final location = placemark.first;
-
-    return "${location.subLocality}";
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +71,7 @@ class BookingList extends StatelessWidget {
     return StreamBuilder(
       stream: worker.snapshots(),
       builder: (context, snapshot) {
+        final user = Provider.of<UserModel>(context).user!;
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Text('');
         }
@@ -141,9 +134,18 @@ class BookingList extends StatelessWidget {
                         ),
                         if (bookingData['payment_status'] == 'done' &&
                             bookingData['status'] != 'selesai')
-                          IconButton.filled(
-                            onPressed: null,
-                            // onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => )),
+                          IconButton.filledTonal(
+                            // onPressed: null,
+                            onPressed: () => Navigator.push(
+                              context,
+                              materialRoute(
+                                InboxDetailPage(
+                                  name: snapshot.data!['name'],
+                                  uid: user.uid,
+                                  role: 'user',
+                                ),
+                              ),
+                            ),
                             icon: Icon(Icons.chat_outlined),
                           ),
                       ],
@@ -175,10 +177,16 @@ class BookingList extends StatelessWidget {
         ),
         SizedBox(height: 15),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("Alamat"),
-            Text(_data['address']),
+            Spacer(),
+            Expanded(
+              child: Text(
+                _data['address'],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         SizedBox(height: 15),

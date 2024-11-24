@@ -8,7 +8,7 @@ import 'package:freelance/pages/worker/profile_worker.dart';
 import 'package:freelance/pages/worker/booking_worker.dart';
 
 class HomeWorker extends StatefulWidget {
-  HomeWorker({super.key, this.selected = 0});
+  HomeWorker({super.key, this.selected = 1});
 
   int selected;
 

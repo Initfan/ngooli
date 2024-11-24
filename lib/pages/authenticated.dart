@@ -37,7 +37,7 @@ class _AuthenticatedState extends State<Authenticated> {
     if (currentUser == null) {
       final passLanding = await redirectToLanding();
       if (passLanding) {
-        return Navigator.pushReplacement(context, materialRoute(AuthPage()));
+        return Navigator.pushReplacementNamed(context, '/auth');
       }
       return Navigator.pushReplacement(context, materialRoute(LandingPage()));
     }
@@ -51,9 +51,9 @@ class _AuthenticatedState extends State<Authenticated> {
         user.data() != null &&
         user.data()!.containsKey('role')) {
       if (user['role'] == 'worker') {
-        return Navigator.pushReplacement(context, materialRoute(HomeWorker()));
+        return Navigator.pushReplacementNamed(context, '/home/worker');
       }
-      return Navigator.pushReplacement(context, materialRoute(HomeUser()));
+      return Navigator.pushReplacementNamed(context, '/home/user');
     }
     return AuthPage();
   }

@@ -2,9 +2,12 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:freelance/model/user.dart';
+import 'package:freelance/pages/inbox/inbox_detail_page.dart';
 import 'package:freelance/pages/worker/booking_complete.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:freelance/utils/route.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class BookingWorkerList extends StatelessWidget {
   const BookingWorkerList({
@@ -15,16 +18,6 @@ class BookingWorkerList extends StatelessWidget {
 
   final String status;
   final QuerySnapshot<Map<String, dynamic>>? booking;
-
-  Future<String> getAddress(double latitude, double longitude) async {
-    List<Placemark> placemark = await placemarkFromCoordinates(
-      latitude,
-      longitude,
-    );
-    final location = placemark.first;
-
-    return "${location.subLocality}";
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,82 +46,68 @@ class BookingWorkerList extends StatelessWidget {
               borderRadius: BorderRadiusDirectional.circular(10),
             ),
             padding: EdgeInsets.symmetric(horizontal: 15).copyWith(bottom: 15),
-            child: Column(
-              children: [
-                cardBooking(bookingData),
-                Divider(height: 2),
-                SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Tanggal"),
-                    Text(DateFormat('EEEE d MMM, yyyy').format(date.toDate())),
-                  ],
-                ),
-                SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Alamat"),
-                    FutureBuilder<String>(
-                      future: getAddress(
-                        bookingData['address']['latitude'],
-                        bookingData['address']['longitude'],
+            child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(bookingData['user_id'])
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return SizedBox();
+                  }
+
+                  return Column(
+                    children: [
+                      cardBooking(bookingData, snapshot.data!),
+                      Divider(height: 2),
+                      SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Tanggal"),
+                          Text(
+                            DateFormat('EEEE d MMM, yyyy').format(
+                              date.toDate(),
+                            ),
+                          )
+                        ],
                       ),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Text('');
-                        }
-                        return Text(snapshot.data!);
-                      },
-                    )
-                  ],
-                ),
-                SizedBox(height: 15),
-                Row(
-                  children: [
-                    Expanded(
-                      child: button(
-                        'Detail',
-                        false,
-                        Placeholder(),
+                      SizedBox(height: 15),
+                      Row(
+                        children: [
+                          Text("Alamat"),
+                          Spacer(),
+                          Expanded(
+                            child: Text(
+                              snapshot.data!['address'],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    SizedBox(width: 20),
-                    if (bookingData['status'] == 'Upcoming')
-                      Expanded(
-                        child: button(
+                      SizedBox(height: 15),
+                      if (bookingData['status'] == 'menunggu')
+                        button(
                           'Selesai',
                           true,
                           BookingComplete(
                             data: bookingData,
                           ),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
+                        )
+                    ],
+                  );
+                }),
           );
         },
       ),
     );
   }
 
-  StreamBuilder<DocumentSnapshot<Object?>> cardBooking(
-    QueryDocumentSnapshot<Map<String, dynamic>> bookingData,
-  ) {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(bookingData['user_id'])
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text('');
-        }
-
+  Widget cardBooking(DocumentSnapshot bookingData, DocumentSnapshot user) {
+    return Builder(
+      builder: (context) {
+        final currentUser = Provider.of<UserModel>(context).user;
         return Column(
           children: [
             Container(
@@ -147,7 +126,7 @@ class BookingWorkerList extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       image: DecorationImage(
-                        image: NetworkImage(snapshot.data!['photo_url']),
+                        image: NetworkImage(user['photo_url']),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -162,15 +141,14 @@ class BookingWorkerList extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text(
-                              snapshot.data!['name'],
+                              user['name'],
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyLarge!
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              // snapshot.data!['name'],
-                              bookingData['payment_status'] == 'done'
+                              bookingData['payment_status'] == 'paid'
                                   ? 'Terbayar'
                                   : 'Belum dibayar',
                               style: Theme.of(context).textTheme.bodyMedium,
@@ -188,11 +166,21 @@ class BookingWorkerList extends StatelessWidget {
                             ),
                           ],
                         ),
-                        IconButton.filled(
-                          onPressed: null,
-                          icon: Icon(Icons.chat_outlined),
-                          // icon: SvgPicture.asset('assets/images/chat.svg'),
-                        ),
+                        if (bookingData['status'] == 'menunggu')
+                          IconButton.filledTonal(
+                            onPressed: () => Navigator.push(
+                              context,
+                              materialRoute(
+                                InboxDetailPage(
+                                  name: user['name'],
+                                  userId: user.id,
+                                  workerId: currentUser!.uid,
+                                  role: 'worker',
+                                ),
+                              ),
+                            ),
+                            icon: Icon(Icons.chat_outlined),
+                          ),
                       ],
                     ),
                   ),

@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:freelance/model/user.dart';
@@ -18,86 +19,94 @@ class HomeWorkerPage extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildUserProfile(user),
-              _balanceCard(),
-            ],
-          ),
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('worker')
+              .where('user_id', isEqualTo: user.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return SizedBox();
+            }
+            final worker = snapshot.data!.docs.first;
+            return SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildUserProfile(user),
+                  _balanceCard(worker),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _balanceCard() => Builder(
-        builder: (context) {
-          return Container(
-            margin: EdgeInsets.symmetric(vertical: 15),
-            padding: EdgeInsets.all(15),
-            width: double.maxFinite,
-            height: MediaQuery.sizeOf(context).height * 0.2,
-            decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey[900]
-                  : Colors.grey[100],
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "+${currency.format(500)} hari ini",
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelLarge!
-                          .copyWith(color: Colors.grey),
-                    ),
-                    Spacer(),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: null,
-                          child: Icon(
-                            Icons.add_card,
-                          ),
+  Widget _balanceCard(DocumentSnapshot worker) {
+    return Builder(
+      builder: (context) {
+        return Container(
+          margin: EdgeInsets.symmetric(vertical: 15),
+          padding: EdgeInsets.all(15),
+          width: double.maxFinite,
+          height: MediaQuery.sizeOf(context).height * 0.2,
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[900]
+                : Colors.grey[100],
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "+${currency.format(worker['balance'])} hari ini",
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .copyWith(color: Colors.grey),
+                  ),
+                  Spacer(),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: null,
+                        child: Icon(
+                          Icons.add_card,
                         ),
-                        SizedBox(width: 15),
-                        GestureDetector(
-                          onTap: null,
-                          child: SvgPicture.asset(
-                            "assets/svg/withdraw.svg",
-                            color: Theme.of(context).iconTheme.color,
-                          ),
+                      ),
+                      SizedBox(width: 15),
+                      GestureDetector(
+                        onTap: null,
+                        child: SvgPicture.asset(
+                          "assets/svg/withdraw.svg",
+                          color: Theme.of(context).iconTheme.color,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                Text(
-                  currency.format(500),
-                  style: Theme.of(context)
-                      .textTheme
-                      .displaySmall!
-                      .copyWith(fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    Text('.. Rating'),
-                    SizedBox(width: 10),
-                    Text('.. Direkomendasikan'),
-                  ],
-                )
-              ],
-            ),
-          );
-        },
-      );
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Text(
+                currency.format(worker['balance']),
+                style: Theme.of(context)
+                    .textTheme
+                    .displaySmall!
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+              Text('.. Direkomendasikan'),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Widget _buildUserProfile(User user) {
     return Builder(

@@ -34,8 +34,11 @@ class _BookingPageState extends State<BookingWorker> {
         .where('worker', isEqualTo: worker.docs.first.reference)
         .get()
         .then(
-          (value) => setState(() => booking = value),
-        );
+      (value) {
+        setState(() => booking = value);
+        print(value);
+      },
+    );
   }
 
   @override
@@ -66,15 +69,15 @@ class _BookingPageState extends State<BookingWorker> {
           children: [
             BookingWorkerList(
               booking: booking,
-              status: 'Upcoming',
+              status: 'menunggu',
             ),
             BookingWorkerList(
               booking: booking,
-              status: 'Completed',
+              status: 'selesai',
             ),
             BookingWorkerList(
               booking: booking,
-              status: 'Cancel',
+              status: 'batal',
             ),
           ],
         ),

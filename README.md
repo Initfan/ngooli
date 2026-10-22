@@ -4,14 +4,14 @@
 
 The application provides various home services, including cleaning, plumbing, electrical installation, appliance repair, and other household maintenance services. With a simple and intuitive interface, users can explore service categories, view technician profiles, and manage their bookings in one place.
 
-## 📱 Application Preview
+## Application Preview
 
 NGOOLI features a modern dark-mode interface designed to provide a comfortable and seamless mobile experience.
 
 <!-- Replace this path with your actual screenshot location in the repository -->
 ![NGOOLI Home Service Mobile App](assets/images/ngooli-preview.png)
 
-## ✨ Features
+## Features
 
 - **User Authentication** — Secure user authentication and account access.
 - **Home Dashboard** — Browse featured promotions, service categories, and popular technicians.
@@ -26,7 +26,7 @@ NGOOLI features a modern dark-mode interface designed to provide a comfortable a
 - **User Profile** — Manage profile information and account settings.
 - **Real-Time Data** — Retrieve and synchronize application data using Firebase services.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Technology | Purpose |
 |---|---|
@@ -37,44 +37,7 @@ NGOOLI features a modern dark-mode interface designed to provide a comfortable a
 | [Firebase Storage](https://firebase.google.com/products/storage) | Store service images, profile photos, and portfolios |
 | [Firebase Cloud Messaging](https://firebase.google.com/products/cloud-messaging) | Push notifications, if enabled |
 
-*Firebase services listed above represent the intended technology stack; the actual services depend on the project's implementation and configuration.*
-
-## 📂 Project Structure
-
-A suggested Flutter project structure:
-
-```text
-ngooli/
-├── android/
-├── ios/
-├── assets/
-│   ├── images/
-│   ├── icons/
-│   └── fonts/
-├── lib/
-│   ├── main.dart
-│   ├── firebase_options.dart
-│   ├── models/
-│   ├── services/
-│   ├── repositories/
-│   ├── providers/
-│   ├── screens/
-│   │   ├── home/
-│   │   ├── services/
-│   │   ├── booking/
-│   │   ├── profile/
-│   │   └── authentication/
-│   ├── widgets/
-│   └── utils/
-├── test/
-├── pubspec.yaml
-├── analysis_options.yaml
-└── README.md
-```
-
-*This is a suggested structure. Adjust the folders to match the actual project.*
-
-## 🚀 Getting Started
+## Getting Started
 
 Follow these steps to run NGOOLI locally.
 
@@ -171,7 +134,7 @@ Build for iOS on macOS:
 flutter build ios --release
 ```
 
-## 🔥 Firebase Integration
+## Firebase Integration
 
 Firebase can serve as the backend infrastructure for NGOOLI.
 
@@ -211,7 +174,7 @@ Example booking document:
 
 The collection names, fields, and booking statuses should be adapted to the actual Firebase schema implemented in the project.
 
-## 🎨 UI/UX Design
+## UI/UX Design
 
 NGOOLI is designed with a focus on usability and accessibility.
 
@@ -234,7 +197,7 @@ To protect application data:
 - Validate booking data and permissions before allowing changes.
 - Never commit private keys, service account credentials, or sensitive configuration files to a public repository.
 
-## 🗺️ Future Improvements
+## Future Improvements
 
 - Online payment integration.
 - Live technician location tracking.
@@ -245,7 +208,7 @@ To protect application data:
 - Customer reviews and ratings.
 - Multi-language support.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions, suggestions, and bug reports are welcome.
 
@@ -255,7 +218,7 @@ Contributions, suggestions, and bug reports are welcome.
 4. Push the branch to your fork.
 5. Open a pull request.
 
-## 📄 License
+## License
 
 This project is currently not associated with a specified open-source license. Add a `LICENSE` file before distributing it under an open-source license.
 
